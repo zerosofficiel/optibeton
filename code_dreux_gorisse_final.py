@@ -430,18 +430,23 @@ def get_correction_Dmax(Dmax):
     return np.interp(Dmax, d_vals, correction_vals)
 
 def evaluer_ouvrabilite(affaissement_cm):
-    ouvrabilite_table = [
-        {"min": 0, "max": 2, "plasticite": "Très ferme", "serrage": "Vibration puissante"},
-        {"min": 3, "max": 5, "plasticite": "Ferme", "serrage": "Bonne vibration"},
-        {"min": 6, "max": 9, "plasticite": "Plastique", "serrage": "Vibration normale"},
-        {"min": 10, "max": 13, "plasticite": "Mou", "serrage": "Piquage"},
-        {"min": 14, "max": 15, "plasticite": "Très mou", "serrage": "Piquage léger"},
-        {"min": 16, "max": 100, "plasticite": "Liquide", "serrage": "Sans vibration"},
-    ]
-    for item in ouvrabilite_table:
-        if item["min"] <= affaissement_cm <= item["max"]:
-            return item["plasticite"], item["serrage"]
-    return "Non défini", "Non défini"
+    """
+    Traduit l’affaissement en plasticité et serrage compatibles avec la table gamma_table.
+    Cette version garantit que toutes les sorties sont reconnues par l’interpolation.
+    """
+    if affaissement_cm <= 2:
+        return "Ferme", "Vibration puissante"
+    elif affaissement_cm <= 5:
+        return "Ferme", "Vibration normale"
+    elif affaissement_cm <= 9:
+        return "Plastique", "Vibration normale"
+    elif affaissement_cm <= 13:
+        return "Mou", "Piquage"
+    elif affaissement_cm <= 15:
+        return "Mou", "Piquage"
+    else:
+        return "Mou", "Piquage"
+
 
 def interpoler_gamma(plasticite, serrage, Dmax):
     gamma_table = {
